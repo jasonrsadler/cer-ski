@@ -18,11 +18,12 @@ export class Skier extends Entity {
     }
 
     updateAsset() {
+        console.log('direction: ', this.direction)
         this.assetName = Constants.SKIER_DIRECTION_ASSET[this.direction];
     }
 
     move() {
-        switch(this.direction) {
+        switch (this.direction) {
             case Constants.SKIER_DIRECTIONS.LEFT_DOWN:
                 this.moveSkierLeftDown();
                 break;
@@ -62,16 +63,20 @@ export class Skier extends Entity {
     }
 
     turnLeft() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.LEFT) {
             this.moveSkierLeft();
         }
         else {
-            this.setDirection(this.direction - 1);
+            this.direction =
+                this.direction === Constants.SKIER_DIRECTIONS.CRASH ?
+                    Constants.SKIER_DIRECTIONS.LEFT :
+                    this.direction - 1;
+            this.setDirection(this.direction);
         }
     }
 
     turnRight() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
             this.moveSkierRight();
         }
         else {
@@ -80,7 +85,7 @@ export class Skier extends Entity {
     }
 
     turnUp() {
-        if(this.direction === Constants.SKIER_DIRECTIONS.LEFT || this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
+        if (this.direction === Constants.SKIER_DIRECTIONS.LEFT || this.direction === Constants.SKIER_DIRECTIONS.RIGHT) {
             this.moveSkierUp();
         }
     }
@@ -111,7 +116,7 @@ export class Skier extends Entity {
             return intersectTwoRects(skierBounds, obstacleBounds);
         });
 
-        if(collision) {
+        if (collision) {
             this.setDirection(Constants.SKIER_DIRECTIONS.CRASH);
         }
     };
