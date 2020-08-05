@@ -31,7 +31,7 @@ export class ObstacleManager {
         const minY = STARTING_OBSTACLE_GAP;
         const maxY = Constants.GAME_HEIGHT / 2;
 
-        for(let i = 0; i < numberObstacles; i++) {
+        for (let i = 0; i < numberObstacles; i++) {
             this.placeRandomObstacle(minX, maxX, minY, maxY);
         }
 
@@ -42,21 +42,21 @@ export class ObstacleManager {
 
     placeNewObstacle(gameWindow, previousGameWindow) {
         const shouldPlaceObstacle = randomInt(1, NEW_OBSTACLE_CHANCE);
-        if(shouldPlaceObstacle !== NEW_OBSTACLE_CHANCE) {
+        if (shouldPlaceObstacle !== NEW_OBSTACLE_CHANCE) {
             return;
         }
 
-        if(gameWindow.left < previousGameWindow.left) {
+        if (!previousGameWindow || gameWindow.left < previousGameWindow.left) {
             this.placeObstacleLeft(gameWindow);
         }
-        else if(gameWindow.left > previousGameWindow.left) {
+        else if (gameWindow.left > previousGameWindow.left) {
             this.placeObstacleRight(gameWindow);
         }
 
-        if(gameWindow.top < previousGameWindow.top) {
+        if (!previousGameWindow || gameWindow.top < previousGameWindow.top) {
             this.placeObstacleTop(gameWindow);
         }
-        else if(gameWindow.top > previousGameWindow.top) {
+        else if (gameWindow.top > previousGameWindow.top) {
             this.placeObstacleBottom(gameWindow);
         }
     };
@@ -97,7 +97,7 @@ export class ObstacleManager {
             );
         });
 
-        if(foundCollision) {
+        if (foundCollision) {
             return this.calculateOpenPosition(minX, maxX, minY, maxY);
         }
         else {

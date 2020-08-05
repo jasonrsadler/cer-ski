@@ -1,6 +1,11 @@
 import * as Constants from "../Constants";
 import { Entity } from "./Entity";
-import { intersectTwoRects, Rect } from "../Core/Utils";
+import {
+    intersectTwoRects,
+    randomInt,
+    getAssetInfo,
+    getBounds
+} from "../Core/Utils";
 
 export class Skier extends Entity {
     assetName = Constants.SKIER_DOWN;
@@ -18,7 +23,6 @@ export class Skier extends Entity {
     }
 
     updateAsset() {
-        console.log('direction: ', this.direction)
         this.assetName = Constants.SKIER_DIRECTION_ASSET[this.direction];
     }
 
@@ -33,6 +37,26 @@ export class Skier extends Entity {
             case Constants.SKIER_DIRECTIONS.RIGHT_DOWN:
                 this.moveSkierRightDown();
                 break;
+        }
+    }
+
+    moveSkierJump() {
+        if (!this.assetName.startsWith(Constants.SKIER_JUMP_BASE)) {
+            let randResult = randomInt(0, 4)
+            this.assetToRestore = this.assetName
+            switch (randResult) {
+                case 0: this.assetName = Constants.SKIER_JUMP_0;
+                    break;
+                case 1: this.assetName = Constants.SKIER_JUMP_1;
+                    break;
+                case 2: this.assetName = Constants.SKIER_JUMP_2;
+                    break;
+                case 3: this.assetName = Constants.SKIER_JUMP_3;
+                    break;
+                case 4: this.assetName = Constants.SKIER_JUMP_4;
+                    break;
+            }
+            setTimeout(() => { this.assetName = this.assetToRestore }, 500);
         }
     }
 
@@ -94,26 +118,37 @@ export class Skier extends Entity {
         this.setDirection(Constants.SKIER_DIRECTIONS.DOWN);
     }
 
+    jump() {
+        if (this.direction === Constants.SKIER_DIRECTIONS.LEFT_DOWN ||
+            this.direction === Constants.SKIER_DIRECTIONS.RIGHT_DOWN ||
+            this.direction === Constants.SKIER_DIRECTIONS.DOWN) {
+            this.moveSkierJump();
+        }
+    }
+
+    checkIfSkierHitRamp(obstacleManager, assetManager) {
+        const skierBounds = getBounds(assetManager.getAsset(this.assetName), this);
+        const collision = obstacleManager.getObstacles().find((obstacle) => {
+            return intersectTwoRects(skierBounds, getAssetInfo(assetManager, obstacle)) &&
+                obstacle.getAssetName() === Constants.RAMP;
+        })
+
+        if (collision && !this.assetName.startsWith(Constants.SKIER_JUMP_BASE)) {
+            this.jump();
+        }
+    }
+
     checkIfSkierHitObstacle(obstacleManager, assetManager) {
-        const asset = assetManager.getAsset(this.assetName);
-        const skierBounds = new Rect(
-            this.x - asset.width / 2,
-            this.y - asset.height / 2,
-            this.x + asset.width / 2,
-            this.y - asset.height / 4
-        );
+        const skierBounds = getBounds(assetManager.getAsset(this.assetName), this)
 
         const collision = obstacleManager.getObstacles().find((obstacle) => {
-            const obstacleAsset = assetManager.getAsset(obstacle.getAssetName());
-            const obstaclePosition = obstacle.getPosition();
-            const obstacleBounds = new Rect(
-                obstaclePosition.x - obstacleAsset.width / 2,
-                obstaclePosition.y - obstacleAsset.height / 2,
-                obstaclePosition.x + obstacleAsset.width / 2,
-                obstaclePosition.y
-            );
-
-            return intersectTwoRects(skierBounds, obstacleBounds);
+            if ((this.assetName.startsWith(Constants.SKIER_JUMP_BASE) &&
+                (obstacle.getAssetName() === Constants.ROCK1 ||
+                    obstacle.getAssetName() === Constants.ROCK2)) ||
+                obstacle.getAssetName() === Constants.RAMP) {
+                return false;
+            }
+            return intersectTwoRects(skierBounds, getAssetInfo(assetManager, obstacle));
         });
 
         if (collision) {
