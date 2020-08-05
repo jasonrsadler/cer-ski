@@ -11,6 +11,25 @@ export function intersectTwoRects(rect1, rect2) {
         rect2.bottom < rect1.top);
 }
 
+export function getAssetInfo(assetManager, obstacle) {
+    const obstacleAsset = assetManager.getAsset(obstacle.getAssetName());
+    const obstaclePosition = obstacle.getPosition();
+    return new Rect(
+        obstaclePosition.x - obstacleAsset.width / 2,
+        obstaclePosition.y - obstacleAsset.height / 2,
+        obstaclePosition.x + obstacleAsset.width / 2,
+        obstaclePosition.y);
+}
+
+export function getBounds(asset, skier) {
+    return new Rect(
+        skier.x - asset.width / 2,
+        skier.y - asset.height / 2,
+        skier.x + asset.width / 2,
+        skier.y - asset.height / 4
+    );
+}
+
 export class Rect {
     left = 0;
     top = 0;

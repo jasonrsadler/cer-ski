@@ -6,7 +6,8 @@ const assetTypes = [
     Constants.TREE,
     Constants.TREE_CLUSTER,
     Constants.ROCK1,
-    Constants.ROCK2
+    Constants.ROCK2,
+    Constants.RAMP
 ];
 
 export class Obstacle extends Entity {
